@@ -1,0 +1,203 @@
+swagger: "2.0"
+info:
+  description: This is the swagger file that goes with our server code
+  version: "1.0.0"
+  title: Blog flask backend API
+consumes:
+  - application/json
+produces:
+  - application/json
+
+basePath: /api
+
+# Paths supported by the server application
+paths:
+  /user:
+    get:
+      operationId: resources.user.read_all
+      tags:
+        - User
+      summary: Read the entire list of user
+      description: Read the list of user
+      # parameters:
+      #   - name: length
+      #     in: query
+      #     type: integer
+      #     description: Number of user to get from user
+      #     required: false
+      #   - name: offset
+      #     in: query
+      #     type: integer
+      #     description: Offset from beginning of list where to start gathering user
+      #     required: false
+      responses:
+        200:
+          description: Successfully read user list operation
+          schema:
+            type: array
+            items:
+              properties:
+                _id:
+                  properties:
+                    $oid:
+                      type: string
+                      description: Database auto-generated unique id
+                uuid:
+                  type: string
+                  description: Backend generated unique id
+                fname:
+                  type: string
+                  description: First name of user
+                lname:
+                  type: string
+                  description: Last name of user
+                timestamp:
+                  type: string
+                  description: Timestamp when the user was created 
+                 
+    # post:
+    #   operationId: resources.user.create
+    #   tags:
+    #     - User
+    #   summary: Create a user and add it to the user list
+    #   description: Create a new user in the user list
+    #   parameters:
+    #     - name: user
+    #       in: body
+    #       description: user to create
+    #       required: True
+    #       schema:
+    #         type: object
+    #         properties:
+    #           fname:
+    #             type: string
+    #             description: First name of user to create
+    #           lname:
+    #             type: string
+    #             description: Last name of user to create
+    #   responses:
+    #     201:
+    #       description: Successfully created user in list
+
+  /user/{user_uuid}:
+    get:
+      operationId: resources.user.read_one
+      tags:
+        - User
+      summary: Read one user from the user list
+      description: Read one user from the user list
+      parameters:
+        - name: user_uuid
+          in: path
+          description: uuid of the user to get from the list
+          type: string
+          required: True
+      responses:
+        200:
+          description: Successfully read user from user list operation
+          schema:
+            properties:
+              uuid:
+                type: string
+              fname:
+                type: string
+              lname:
+                type: string
+              timestamp:
+                type: string
+
+    put:
+      operationId: resources.user.update
+      tags:
+        - User
+      summary: Update a user in the user list
+      description: Update a user in the user list
+      parameters:
+        - name: user_uuid
+          in: path
+          description: uuid of the user to update in the list
+          type: string
+          required: True
+        - name: update_user
+          in: body
+          schema:
+            type: object
+            properties:
+              fname:
+                type: string
+              lname:
+                type: string
+      responses:
+        204:
+          description: Successfully updated user in user list
+
+    delete:
+      operationId: resources.user.delete
+      tags:
+        - User
+      summary: Delete a user from the user list
+      description: Delete a user
+      parameters:
+        - name: user_uuid
+          in: path
+          type: string
+          required: True
+      responses:
+        200:
+          description: Successfully deleted a user from user list
+  /signup:
+      post:
+        operationId: resources.auth.signup
+        tags:
+          - Sign-Up
+        summary: Create a user and add it to the user list
+        description: Create a new user in the user list
+        parameters:
+          - name: user
+            in: body
+            description: user to create
+            required: True
+            schema:
+              type: object
+              properties:
+                fname:
+                  type: string
+                  description: First name of user to create
+                lname:
+                  type: string
+                  description: Last name of user to create
+                email:
+                  type: string
+                  format: email
+                  description: email of user to create
+                password:
+                  type: string
+                  description: password of user to create
+        responses:
+          201:
+            description: Successfully created user in list
+  /login:
+      post:
+        operationId: resources.auth.login
+        tags:
+          - Log-In
+        summary: Create a user access token after checking
+        description: Create a user access token after checking
+        parameters:
+          - name: loginUser
+            in: body
+            description: user to login
+            required: True
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: email of user to create
+                password:
+                  type: string
+                  description: password of user to create
+        responses:
+          201:
+            description: Successfully created user in list
