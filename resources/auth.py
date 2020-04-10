@@ -54,19 +54,21 @@ def signup(user):
     )
 
 def login(loginUser):
-    user = User.objects().get(email=loginUser.get('email'))
-    if not user:
+    # check if loginUser exist
+    USER = User.objects(email__not__ne=loginUser['email'])
+    if not USER:
         abort(
             404, "User with email {email} does not exists".format(
                 email=loginUser.get('email')),
         )
-    print(dir(user))
+
+    user = User.objects().get(email=loginUser.get('email'))
     authorized = user.check_password(loginUser.get('password'))
     if not authorized:
         abort(
             404, "User with email {email} password incorrect".format(
                 email=loginUser.get('email')),
         )
-    expires = datetime.timedelta(days=1)
+    expires = datetime.timedelta(days=30)
     access_token = create_access_token(identity=str(user.uuid), expires_delta=expires)
     return {'token': access_token}, 200

@@ -10,12 +10,10 @@ from datetime import datetime
 
 # 3rd party modules
 from flask import make_response, abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # database schema
 from database.models import User
-
-
 
 def get_timestamp():
     return datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
@@ -58,16 +56,17 @@ def update(user_uuid, update_user):
     :param user:  user to update
     :return:        updated user structure
     """
+    user_id = get_jwt_identity()
     USER = User.objects(uuid__not__ne=user_uuid)
-    if USER:
+    if USER and user_id==USER[0]['uuid']:
         USER[0].update(fname=update_user['fname'],
                          lname=update_user['lname'], timestamp=get_timestamp())
         return make_response(
-            "{uuid} successfully updated".format(uuid=user_uuid), 204
+            "{uuid} successfully updated".format(uuid=user_uuid), 200
         )
     else:
         abort(
-            404, "User with uuid {uuid} not found".format(uuid=user_uuid)
+            404, "User with uuid {uuid} NOT found or NOT you".format(uuid=user_uuid)
         )
 
 @jwt_required
@@ -77,10 +76,11 @@ def delete(user_uuid):
     :param user_uuid:   uuid of user to delete
     :return:        200 on successful delete, 404 if not found
     """
+    user_id = get_jwt_identity()
     USER = User.objects(uuid__not__ne=user_uuid)
 
     # Does the user to delete exist?
-    if USER:
+    if USER and user_id==USER[0]['uuid']:
         USER[0].delete()
         return make_response(
             "User with uuid {uuid} successfully deleted".format(
@@ -90,5 +90,5 @@ def delete(user_uuid):
     # Otherwise, nope, user to delete not found
     else:
         abort(
-            404, "User with uuid {uuid} not found".format(uuid=user_uuid)
+            404, "User with uuid {uuid} NOT found or NOT you".format(uuid=user_uuid)
         )
